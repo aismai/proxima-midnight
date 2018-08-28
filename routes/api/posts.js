@@ -150,4 +150,75 @@ router.post(
     });
   }
 );
+
+// @route  POST api/posts/comment/:post_id
+// @desc   Add comment to a post
+// @access Private
+router.post(
+  "/comment/:post_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validatePostInput(req.body);
+
+    if (!isValid) {
+      // if any errors send 400 with errors object
+      return res.status(400).json(errors);
+    }
+
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.post_id)
+        .then(post => {
+          const newComment = {
+            text: req.body.text,
+            name: req.body.name,
+            avatar: req.body.avatar,
+            user: req.user.id
+          };
+          // Add to comments array
+          post.comments.unshift(newComment);
+
+          // Save
+          post.save().then(post => res.json(post));
+        })
+        .catch(err => res.status(404).json({ postnotfound: "Post not found" }));
+    });
+  }
+);
+
+// @route  DELETE api/posts/comment/:post_id/:comment_id
+// @desc   Remove comment from Post
+// @access Private
+router.delete(
+  "/comment/:post_id/:comment_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Profile.findOne({ user: req.user.id }).then(profile => {
+      Post.findById(req.params.post_id)
+        .then(post => {
+          // Check if the comment exists
+          const filteredCommentsArray = post.comments.filter(
+            comment => comment._id.toString() === req.params.comment_id
+          );
+
+          if (!filteredCommentsArray.length) {
+            return res
+              .status(404)
+              .json({ commentnotexist: "Comment does not exist" });
+          }
+
+          // Get remove index
+          const removeIndex = post.comments
+            .map(item => item._id.toString())
+            .indexOf(req.params.comment_id);
+
+          // Splice comment out of array
+          post.comments.splice(removeIndex, 1);
+
+          // Save
+          post.save().then(post => res.json(post));
+        })
+        .catch(err => res.status(404).json({ postnotfound: "Post not found" }));
+    });
+  }
+);
 module.exports = router;
