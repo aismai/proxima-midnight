@@ -11,6 +11,12 @@ class Login extends Component {
     errors: {}
   };
 
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
+  }
+
   componentWillReceiveProps(nextProps) {
     console.log(nextProps);
 
