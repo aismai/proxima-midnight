@@ -5,7 +5,7 @@ const passport = require("passport");
 
 // Load Validation
 const validateProfileInput = require("../../validation/profile");
-const validateExpirienceInput = require("../../validation/expirience");
+const validateExperienceInput = require("../../validation/experience");
 const validateEducationInput = require("../../validation/education");
 
 // Load Profile Model
@@ -164,14 +164,14 @@ router.post(
   }
 );
 
-// @route  POST api/profile/expirience
+// @route  POST api/profile/experience
 // @desc   Add experience to profile
 // @access Private
 router.post(
-  "/expirience",
+  "/experience",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
-    const { errors, isValid } = validateExpirienceInput(req.body);
+    const { errors, isValid } = validateExperienceInput(req.body);
 
     // Check validation
     if (!isValid) {
@@ -189,8 +189,8 @@ router.post(
         description: req.body.description
       };
 
-      // Add to expirience array
-      profile.expirience.unshift(newExp);
+      // Add to experience array
+      profile.experience.unshift(newExp);
 
       profile.save().then(profile => res.json(profile));
     });
@@ -222,7 +222,7 @@ router.post(
         description: req.body.description
       };
 
-      // Add to expirience array
+      // Add to experience array
       profile.education.unshift(newEdu);
 
       profile.save().then(profile => res.json(profile));
@@ -230,22 +230,22 @@ router.post(
   }
 );
 
-// @route  DELETE api/profile/expirience/:exp_id
+// @route  DELETE api/profile/experience/:exp_id
 // @desc   Delete expririence from profile
 // @access Private
 router.delete(
-  "/expirience/:exp_id",
+  "/experience/:exp_id",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
     Profile.findOne({ user: req.user.id })
       .then(profile => {
         // Get remove index
-        const removeIndex = profile.expirience
+        const removeIndex = profile.experience
           .map(item => item.id)
           .indexOf(req.params.exp_id);
 
         // Splice out of array
-        profile.expirience.splice(removeIndex, 1);
+        profile.experience.splice(removeIndex, 1);
 
         // Save profile
         profile.save().then(profile => res.json(profile));
