@@ -22,11 +22,11 @@ import AddExperience from "./components/AddCredentials/AddExprerience";
 import AddEducation from "./components/AddCredentials/AddEducation";
 import Profiles from "./components/Profiles/Profiles";
 import Profile from "./components/Profile/Profile";
+import NotFound from "./components/NotFound/NotFound";
 
 import "./App.css";
 
 // Check for token
-
 if (localStorage.jwtToken) {
   // Set auth token header auth
   setAuthToken(localStorage.jwtToken);
@@ -91,6 +91,7 @@ class App extends Component {
                   component={AddEducation}
                 />
               </Switch>
+              <Route exact path="/not-found" component={NotFound} />
             </div>
             <Footer />
           </div>
